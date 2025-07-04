@@ -1,0 +1,135 @@
+{% comment %}
+  Sticky Navigation Section
+{% endcomment %}
+
+{{ 'sticky-navigation.css' | asset_url | stylesheet_tag }}
+{{ 'sticky-navigation.js' | asset_url | script_tag }}
+<div id="sticky-header" class="sticky-navigation hidden">
+  <div id="shopify-section-{{ section.id }}" class="shopify-section sticky-navigation">
+    <sticky-navigation class="flex z-20 bottom-0 right-0 h-full hidden-sticky-nav fixed header-hidden">
+      <div class="page-width flex justify-between w-full items-center">
+        <ul class="sticky-navigation_btns flex gap-8">
+          {% for block in section.blocks %}
+            <li class="sticky-navigation_button {% if forloop.first %}active{% endif %}">
+              <a href="#{{ block.settings.anchor_id }}">{{ block.settings.label }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+
+        <form
+          method="post"
+          action="/cart/add"
+          class="product-form grid gap-6"
+          enctype="multipart/form-data"
+          data-type="add-to-cart-form"
+        >
+          <input type="hidden" name="form_type" value="product">
+          <input type="hidden" name="utf8" value="✓">
+          <input type="hidden" name="id" value="{{ product.variants.first.id }}">
+
+          <div class="sticky-buy-button__variant grid items-center gap-4" style="display:flex;">
+            {% if product.featured_image %}
+              <sticky-variant-media class="hidden md:block media media--adapt relative overflow-hidden">
+                <img
+                  src="{{ product.featured_image | image_url: width: 50 }}"
+                  alt="{{ product.title }}"
+                  loading="lazy"
+                  class="loaded"
+                  width="50"
+                  height="50"
+                >
+              </sticky-variant-media>
+            {% endif %}
+
+            <div class="grid gap-2">
+              <div class="grid gap-1">
+                <p class="text-base font-bold leading-tight">{{ product.title }}</p>
+              </div>
+            </div>
+
+            <button type="submit" name="add" class="button button--primary">
+              <span class="btn-fill" data-fill=""></span>
+              <span class="btn-text">{{ section.settings.button_text }}</span>
+              <span class="btn-loader"><span></span><span></span><span></span></span>
+            </button>
+          </div>
+
+          <input type="hidden" name="product-id" value="{{ product.id }}">
+          <input type="hidden" name="section-id" value="{{ section.id }}">
+        </form>
+      </div>
+    </sticky-navigation>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Sticky Navigation",
+  "tag": "section",
+  "class": "sticky-navigation-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Add to cart button text",
+      "default": "Add to cart"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Navigation Link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Link Label",
+          "default": "Section Title"
+        },
+        {
+          "type": "text",
+          "id": "anchor_id",
+          "label": "Anchor ID (without #)",
+          "default": "section-id"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Sticky Navigation",
+      "blocks": [
+        {
+          "type": "link",
+          "settings": {
+            "label": "Features",
+            "anchor_id": "product_information"
+          }
+        },
+        {
+          "type": "link",
+          "settings": {
+            "label": "Spec & Size",
+            "anchor_id": "specifications"
+          }
+        },
+        {
+          "type": "link",
+          "settings": {
+            "label": "FAQs",
+            "anchor_id": "faqs"
+          }
+        },
+        {
+          "type": "link",
+          "settings": {
+            "label": "Reviews",
+            "anchor_id": "judgeme_product_reviews"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

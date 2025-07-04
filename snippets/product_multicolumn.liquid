@@ -1,0 +1,131 @@
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
+  <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %} relative">
+    {%- render 'section-heading', section: section -%}
+
+    <slider-element
+      id="Slider-{{ section.id }}"
+      class="grid slider--desktop slider{% if section.settings.swipe_on_mobile %} slider--tablet{% endif %}"
+      selector=".card-grid>.card"
+    >
+      <div class="multicolumn with-{{ section.blocks.size }} card-grid card-grid--{{ section.settings.columns }} mobile:card-grid--{{ section.settings.columns_mobile }} grid relative z-1">
+        {%- liquid
+          assign with_gradient = false
+          if section.settings.gradient_highlight != blank and section.settings.gradient_highlight != 'rgba(0,0,0,0)'
+            assign with_gradient = true
+          endif
+        -%}
+        {%- for block in section.blocks -%}
+          <div
+            class="multicolumn-card{% if block.settings.show_border %} with-border{% endif %} card flex gap-5 w-full flex-col items-start xl:flex-row md:text-{{ block.settings.text_alignment }} text-{{ block.settings.text_alignment_mobile }}"
+            {{ block.shopify_attributes }}
+          >
+            <div class="grid gap-4 lg:gap-6 w-full">
+              {%- if block.settings.video != blank -%}
+                {%- capture sizes -%}(max-width: 639px) 100vw, (max-width: 1023px) calc(100vw / 2 - 40px), (max-width: 1535px) calc(min(100vw, {{ settings.page_width }}px) / 3 - 40px), calc(min(100vw, {{ settings.page_width }}px) / 3 - 80px){%- endcapture -%}
+                <a
+                  class="block media media--{{ block.settings.image_ratio }} media--transparent relative overflow-hidden"
+                  {% if block.settings.button_link != blank %}
+                    href="{{ block.settings.button_link }}"
+                    {%- if block.settings.button_external %} target="_blank" rel="noopener"{% endif -%}
+                  {% else %}
+                    role="link" aria-disabled="true"
+                  {% endif %}
+                  aria-label="{{ block.settings.heading | escape }}"
+                >
+                  {%- liquid
+                    assign video_alt = block.settings.video.alt | default: block.settings.image.alt
+                    assign alt = 'general.accessibility.load_video' | t: description: video_alt | escape
+                    assign preview_image = block.settings.video.preview_image | default: block.settings.image
+
+                    capture poster
+                      if preview_image != blank
+                        echo preview_image | image_url: width: preview_image.width | image_tag: loading: 'lazy', widths: '180,360,540,720,900,1080,1600', sizes: sizes, is: 'lazy-image', class: 'inline-block', alt: alt
+                      else
+                        echo 'lifestyle-1' | placeholder_svg_tag: 'placeholder'
+                      endif
+                    endcapture
+                  -%}
+                  <video-media class="block" style="--aspect-ratio: {{ block.settings.video.aspect_ratio }}" autoplay>
+                    {{- poster -}}
+                    <template>
+                      {{-
+                        block.settings.video
+                        | video_tag:
+                          playsinline: true,
+                          muted: true,
+                          autoplay: true,
+                          loop: true,
+                          controls: false,
+                          preload: 'none',
+                          image_size: '400x'
+                      -}}
+                    </template>
+                  </video-media>
+                </a>
+              {%- elsif block.settings.image != blank -%}
+                {%- capture sizes -%}(max-width: 639px) 100vw, (max-width: 1023px) calc(100vw / 2 - 40px), (max-width: 1535px) calc(min(100vw, {{ settings.page_width }}px) / 3 - 40px), calc(min(100vw, {{ settings.page_width }}px) / 3 - 80px){%- endcapture -%}
+                <a
+                  class="block media media--{{ block.settings.image_ratio }} media--transparent relative overflow-hidden"
+                  {% if block.settings.button_link != blank %}
+                    href="{{ block.settings.button_link }}"
+                    {%- if block.settings.button_external %} target="_blank" rel="noopener"{% endif -%}
+                  {% else %}
+                    role="link" aria-disabled="true"
+                  {% endif %}
+                  aria-label="{{ block.settings.heading | escape }}"
+                >
+                  {{-
+                    block.settings.image
+                    | image_url: width: block.settings.image.width
+                    | image_tag:
+                      loading: 'lazy',
+                      widths: '180,360,540,720,900,1080,1600',
+                      sizes: sizes,
+                      is: 'lazy-image',
+                      class: 'inline-block'
+                  -}}
+                </a>
+              {%- endif -%}
+
+              {%- if block.settings.heading != blank
+                or block.settings.text != blank
+                or block.settings.button_label != blank
+              -%}
+                <div class="multicolumn-card__info grid gap-4 lg:gap-6">
+                  {%- if block.settings.heading != blank -%}
+                    <p class="heading {{ block.settings.heading_size }} leading-tight tracking-tight">
+                      {%- render 'highlighted-text',
+                        content: block.settings.heading,
+                        style: block.settings.highlighted_text,
+                        scribble: block.settings.highlighted_scribble,
+                        gradient: with_gradient
+                      -%}
+                    </p>
+                  {%- endif -%}
+
+                  {%- if block.settings.text != blank -%}
+                    <div class="rte leading-normal">
+                      {{- block.settings.text -}}
+                    </div>
+                  {%- endif -%}
+
+                  {%- if block.settings.button_label != blank -%}
+                    <p>
+                      {%- render 'button',
+                        label: block.settings.button_label,
+                        link: block.settings.button_link,
+                        style: block.settings.button_style,
+                        external: block.settings.button_external,
+                        show_icon: block.settings.button_icon
+                      -%}
+                    </p>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+    </slider-element>
+  </div>
+</div>

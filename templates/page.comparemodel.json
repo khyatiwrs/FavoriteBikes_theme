@@ -1,0 +1,15 @@
+{
+  "sections": {
+    "main": {
+      "type": "compare-models",
+      "settings": {
+        "heading": "Compare Models",
+        "heading_tag": "h2",
+        "heading_size": "text-3xl",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    }
+  },
+  "order": ["main"]
+}
